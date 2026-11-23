@@ -92,10 +92,23 @@ return types.ObjectUnknown(map[string]attr.Type{
 }
 {{- end}}
 
+{{- $dDeclared := false}}
 {{- range $key, $value := .AttributeTypes }}
 {{- if eq $value "Object"}}
 
-{{$key.ToCamelCase}}Val, d := types.ObjectValue(v.{{$key.ToPrefixPascalCase $.Name}}.AttributeTypes(ctx), v.{{$key.ToPrefixPascalCase $.Name}}.Attributes())
+var {{$key.ToCamelCase}}Val basetypes.ObjectValue
+{{- if not $dDeclared}}
+var d diag.Diagnostics
+{{- $dDeclared = true}}
+{{- end}}
+switch {
+case v.{{$key.ToPrefixPascalCase $.Name}}.IsNull():
+{{$key.ToCamelCase}}Val = types.ObjectNull({{index $.TypeNames $key}}Value{}.AttributeTypes(ctx))
+case v.{{$key.ToPrefixPascalCase $.Name}}.IsUnknown():
+{{$key.ToCamelCase}}Val = types.ObjectUnknown({{index $.TypeNames $key}}Value{}.AttributeTypes(ctx))
+default:
+{{$key.ToCamelCase}}Val, d = types.ObjectValue({{index $.TypeNames $key}}Value{}.AttributeTypes(ctx), v.{{$key.ToPrefixPascalCase $.Name}}.Attributes())
+}
 
 diags.Append(d...)
 

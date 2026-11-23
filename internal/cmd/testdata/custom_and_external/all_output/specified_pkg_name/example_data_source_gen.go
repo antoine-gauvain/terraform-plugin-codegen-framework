@@ -7498,7 +7498,16 @@ func (v ListNestedBlockThreeValue) ToObjectValue(ctx context.Context) (basetypes
 		)
 	}
 
-	objectAttributeVal, d := types.ObjectValue(v.ObjectAttribute.AttributeTypes(ctx), v.ObjectAttribute.Attributes())
+	var objectAttributeVal basetypes.ObjectValue
+	var d diag.Diagnostics
+	switch {
+	case v.ObjectAttribute.IsNull():
+		objectAttributeVal = types.ObjectNull(ObjectAttributeValue{}.AttributeTypes(ctx))
+	case v.ObjectAttribute.IsUnknown():
+		objectAttributeVal = types.ObjectUnknown(ObjectAttributeValue{}.AttributeTypes(ctx))
+	default:
+		objectAttributeVal, d = types.ObjectValue(ObjectAttributeValue{}.AttributeTypes(ctx), v.ObjectAttribute.Attributes())
+	}
 
 	diags.Append(d...)
 
@@ -10382,7 +10391,16 @@ func (v SingleNestedBlockThreeValue) ToObjectValue(ctx context.Context) (basetyp
 		)
 	}
 
-	objectAttributeVal, d := types.ObjectValue(v.ObjectAttribute.AttributeTypes(ctx), v.ObjectAttribute.Attributes())
+	var objectAttributeVal basetypes.ObjectValue
+	var d diag.Diagnostics
+	switch {
+	case v.ObjectAttribute.IsNull():
+		objectAttributeVal = types.ObjectNull(ObjectAttributeValue{}.AttributeTypes(ctx))
+	case v.ObjectAttribute.IsUnknown():
+		objectAttributeVal = types.ObjectUnknown(ObjectAttributeValue{}.AttributeTypes(ctx))
+	default:
+		objectAttributeVal, d = types.ObjectValue(ObjectAttributeValue{}.AttributeTypes(ctx), v.ObjectAttribute.Attributes())
+	}
 
 	diags.Append(d...)
 

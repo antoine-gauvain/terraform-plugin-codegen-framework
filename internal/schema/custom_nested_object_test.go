@@ -1565,7 +1565,16 @@ return objVal, diags
 func (v ExampleValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 var diags diag.Diagnostics
 
-objectAttributeVal, d := types.ObjectValue(v.ObjectAttribute.AttributeTypes(ctx), v.ObjectAttribute.Attributes())
+var objectAttributeVal basetypes.ObjectValue
+var d diag.Diagnostics
+switch {
+case v.ObjectAttribute.IsNull():
+objectAttributeVal = types.ObjectNull(ObjectAttributeValue{}.AttributeTypes(ctx))
+case v.ObjectAttribute.IsUnknown():
+objectAttributeVal = types.ObjectUnknown(ObjectAttributeValue{}.AttributeTypes(ctx))
+default:
+objectAttributeVal, d = types.ObjectValue(ObjectAttributeValue{}.AttributeTypes(ctx), v.ObjectAttribute.Attributes())
+}
 
 diags.Append(d...)
 
@@ -1612,7 +1621,16 @@ return objVal, diags
 func (v ExampleValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 var diags diag.Diagnostics
 
-typeVal, d := types.ObjectValue(v.ExampleType.AttributeTypes(ctx), v.ExampleType.Attributes())
+var typeVal basetypes.ObjectValue
+var d diag.Diagnostics
+switch {
+case v.ExampleType.IsNull():
+typeVal = types.ObjectNull(TypeValue{}.AttributeTypes(ctx))
+case v.ExampleType.IsUnknown():
+typeVal = types.ObjectUnknown(TypeValue{}.AttributeTypes(ctx))
+default:
+typeVal, d = types.ObjectValue(TypeValue{}.AttributeTypes(ctx), v.ExampleType.Attributes())
+}
 
 diags.Append(d...)
 
